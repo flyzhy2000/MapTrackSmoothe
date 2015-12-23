@@ -1,29 +1,21 @@
 package com.location.demo.map_location_smoothe_demo;
 
 import android.app.Activity;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
-import com.baidu.mapapi.map.Projection;
-import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.inner.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +24,8 @@ public class MainActivity extends Activity {
 
     private MapView mapView = null;
     Polyline polyline;
-    LatLng point1, point2, point3, point4,point5,point6,point7,point8,point9;
+    Button mJiuPianBtn, mHistoryBtn;
+    LatLng point1, point2, point3, point4, point5, point6, point7, point8;
     BaiduMap mMap;
 
     @Override
@@ -42,6 +35,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mapView = (MapView) findViewById(R.id.bmapView);
         mMap = mapView.getMap();
+        mJiuPianBtn = (Button) findViewById(R.id.btn_jiupian);
+        mHistoryBtn = (Button) findViewById(R.id.btn_origin);
 
         LatLng szjm = new LatLng(30.594723, 104.074576);
 
@@ -70,7 +65,7 @@ public class MainActivity extends Activity {
         point8 = new LatLng(30.581774, 104.074935);
 
 
-        List<LatLng> points = new ArrayList<LatLng>();
+        final List<LatLng> points = new ArrayList<LatLng>();
         points.add(point1);
         points.add(point2);
         points.add(point3);
@@ -81,7 +76,36 @@ public class MainActivity extends Activity {
         points.add(point8);
         OverlayOptions ooPolyline = new PolylineOptions().width(10)
                 .color(0xAAFF0000).points(points).visible(true);
-        mMap.addOverlay(ooPolyline);
+        polyline = (Polyline) mMap.addOverlay(ooPolyline);
+        mJiuPianBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng point_modify = new LatLng(30.589811, 104.075083);
+                List<LatLng> newPoints = new ArrayList<LatLng>();
+                newPoints = polyline.getPoints();
+                newPoints.set(3, point_modify);
+                polyline.remove();
+                OverlayOptions ooPolyline = new PolylineOptions().width(10)
+                        .color(0xAAFF0000).points(newPoints).visible(true);
+                polyline = (Polyline) mMap.addOverlay(ooPolyline);
+
+            }
+        });
+
+        mHistoryBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng point_modify = new LatLng(30.589811, 104.076083);
+                List<LatLng> newPoints = new ArrayList<LatLng>();
+                newPoints = polyline.getPoints();
+                newPoints.set(3, point_modify);
+                polyline.remove();
+                OverlayOptions ooPolyline = new PolylineOptions().width(10)
+                        .color(0xAAFF0000).points(newPoints).visible(true);
+                polyline = (Polyline) mMap.addOverlay(ooPolyline);
+
+            }
+        });
     }
 
 
