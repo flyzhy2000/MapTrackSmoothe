@@ -8,10 +8,12 @@ import android.widget.Button;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
@@ -38,10 +40,9 @@ public class MainActivity extends Activity {
         mJiuPianBtn = (Button) findViewById(R.id.btn_jiupian);
         mHistoryBtn = (Button) findViewById(R.id.btn_origin);
 
-        LatLng szjm = new LatLng(30.594723, 104.074576);
 
 // 设定地图状态（设定初始中心点和缩放级数）
-
+        LatLng szjm = new LatLng(30.594723, 104.074576);
         MapStatus mMapStatus = new MapStatus.Builder().target(szjm).zoom(15).build();
 
         // 定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
@@ -77,6 +78,14 @@ public class MainActivity extends Activity {
         OverlayOptions ooPolyline = new PolylineOptions().width(10)
                 .color(0xAAFF0000).points(points).visible(true);
         polyline = (Polyline) mMap.addOverlay(ooPolyline);
+
+        PolynomialEquation equation = fittingLineToPoints(points);
+        double fittingLongitude = getMeanLongitude(points);
+        double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
+        LatLng correctPoint = new LatLng(fittingLatitude, fittingLongitude);
+        mMap.addOverlay(new MarkerOptions().position(correctPoint).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+
+
         mJiuPianBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,4 +118,38 @@ public class MainActivity extends Activity {
     }
 
 
+    class PolynomialEquation {
+        double a0;
+        double a1;
+    }
+
+    private PolynomialEquation fittingLineToPoints (List<LatLng> mapPoints) {
+        PolynomialEquation lineEquation = new PolynomialEquation();
+
+        double sumX = 0;
+        double sumY = 0;
+        double sumX2 = 0;
+        double sumXY = 0;
+        for (LatLng point : mapPoints) {
+            sumX += point.longitude;
+            sumY += point.latitude;
+            sumX2 += point.longitude*point.longitude;
+            sumXY += point.longitude*point.latitude;
+        }
+        double meanX = sumX/mapPoints.size();
+        double meanY = sumY/mapPoints.size();
+        lineEquation.a1 = (sumXY - sumX * meanY) / (sumX2 - sumX * meanX);
+        lineEquation.a0 = meanY - lineEquation.a1 * meanX;
+
+        return lineEquation;
+    }
+
+    private double getMeanLongitude (List<LatLng> mapPoints) {
+        double sumLongitude = 0;
+        for (LatLng point : mapPoints) {
+            sumLongitude += point.longitude;
+        }
+
+        return sumLongitude/mapPoints.size();
+    }
 }
