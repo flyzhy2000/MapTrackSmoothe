@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
 
 
 // 设定地图状态（设定初始中心点和缩放级数）
-        LatLng szjm = new LatLng(30.594723, 104.074576);
+        LatLng szjm = new LatLng(30.54391264,104.06643748);
         MapStatus mMapStatus = new MapStatus.Builder().target(szjm).zoom(15).build();
 
         // 定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
@@ -65,25 +65,53 @@ public class MainActivity extends Activity {
         point7 = new LatLng(30.583562, 104.074945);
         point8 = new LatLng(30.581774, 104.074935);
 
+        LatLng L1 = new LatLng(30.54391264,104.06643748);
+        LatLng L2 = new LatLng(30.54381515, 104.06641741);
+        LatLng L3 = new LatLng(30.54383535, 104.06647200);
+        LatLng L4 = new LatLng(30.54384291, 104.06649112);
+        LatLng L5 = new LatLng(30.53909003, 104.06699001);
+        LatLng L6 = new LatLng(30.53853750, 104.06684517);
+        LatLng L7 = new LatLng(30.53848305, 104.06711915);
+        LatLng L8 = new LatLng(30.53837426, 104.06728721);
+
+
 
         final List<LatLng> points = new ArrayList<LatLng>();
-        points.add(point1);
-        points.add(point2);
-        points.add(point3);
-        points.add(point4);
-        points.add(point5);
-        points.add(point6);
-        points.add(point7);
-        points.add(point8);
+//        points.add(point1);
+//        points.add(point2);
+//        points.add(point3);
+//        points.add(point4);
+//        points.add(point5);
+//        points.add(point6);
+//        points.add(point7);
+//        points.add(point8);
+        points.add(L1);
+        points.add(L2);
+        points.add(L3);
+        points.add(L4);
+        points.add(L5);
+        points.add(L6);
+        points.add(L7);
+        points.add(L8);
         OverlayOptions ooPolyline = new PolylineOptions().width(10)
                 .color(0xAAFF0000).points(points).visible(true);
         polyline = (Polyline) mMap.addOverlay(ooPolyline);
 
-        PolynomialEquation equation = fittingLineToPoints(points);
+        List<LatLng> part1 = points.subList(0, 3);
+
+        PolynomialEquation equation = fittingLineToPoints(part1);
         double fittingLongitude = getMeanLongitude(points);
         double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
         LatLng correctPoint = new LatLng(fittingLatitude, fittingLongitude);
         mMap.addOverlay(new MarkerOptions().position(correctPoint).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+
+        List<LatLng> part2 = points.subList(4, 7);
+        equation = fittingLineToPoints(part2);
+        fittingLongitude = getMeanLongitude(points);
+        fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
+        correctPoint = new LatLng(fittingLatitude, fittingLongitude);
+        mMap.addOverlay(new MarkerOptions().position(correctPoint).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+
 
 
         mJiuPianBtn.setOnClickListener(new OnClickListener() {
