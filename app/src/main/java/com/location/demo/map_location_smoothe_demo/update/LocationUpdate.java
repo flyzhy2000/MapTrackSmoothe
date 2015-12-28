@@ -100,6 +100,9 @@ public class LocationUpdate {
             mLocationManager.removeUpdates(GpsLocationListener);
         } else if (mLocationMode == NETWORK_MODE) {
             mLocationManager.removeUpdates(NetworkLocationListener);
+        } else if (mLocationMode == AUTO_MODE) {
+            mLocationManager.removeUpdates(GpsLocationListener);
+            mLocationManager.removeUpdates(NetworkLocationListener);
         }
         unRegisterCommonLocationListener();
 
@@ -146,6 +149,11 @@ public class LocationUpdate {
                         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 mScanSpan, 0, GpsLocationListener);
                     } else if (mLocationMode == NETWORK_MODE) {
+                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                                mScanSpan, 0, NetworkLocationListener);
+                    } else if (mLocationMode == AUTO_MODE) {
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                                mScanSpan, 0, GpsLocationListener);
                         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 mScanSpan, 0, NetworkLocationListener);
                     }
@@ -249,6 +257,28 @@ public class LocationUpdate {
     private LocationListener NetworkLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
+            mSampleList.add(location);
+            if (checkFittingInterval()) {
+                PolynomialEquation equation =  EquationUtils.fittingLineToPoints(mSampleList);
+                double fittingLongitude = EquationUtils.getMeanLongitude(mSampleList);
+                double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
+                if (!Double.isNaN(fittingLatitude) && !Double.isNaN(fittingLongitude)) {
+                    Location updateLocation = new Location(LocationManager.NETWORK_PROVIDER);
+                    updateLocation.setLatitude(fittingLatitude);
+                    updateLocation.setLongitude(fittingLongitude);
+                    updateLocation.setTime(System.currentTimeMillis());
+                    mLocation = updateLocation;
+                    mSampleList.clear();
+                    long time = System.currentTimeMillis();
+                    String timedate = TimeUtils.formatLocationTime(time);
+                    String data = "Network---get origin location is: " + location.getLatitude() + ","
+                            + location.getLongitude();
+                    FileUtils.saveFile(timedate + "  " + data, "originlocation_demo");
+                }
+                if (mListener != null) {
+                    mListener.onReceiveCommonLocation(mLocation, location);
+                }
+            }
         }
 
         @Override
