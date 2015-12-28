@@ -2,10 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
     <com.baidu.mapapi.map.MapView
@@ -23,7 +19,7 @@
         android:layout_alignLeft="@+id/btn_jiupian"
         android:layout_marginRight="20dp"
         android:padding="10dp"
-        android:text="历史"
+        android:text="轨迹"
         android:textSize="14sp"/>
     <Button
         android:id="@+id/btn_jiupian"
@@ -32,7 +28,7 @@
         android:layout_alignParentRight="true"
         android:layout_margin="20dp"
         android:padding="10dp"
-        android:text="纠偏"
+        android:text="开始"
         android:textSize="14sp"/>
 
 </RelativeLayout>
