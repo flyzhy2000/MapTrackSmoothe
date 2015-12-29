@@ -209,9 +209,9 @@ public class LocationUpdate {
                         if (distance > 10 && distance < 500) {  // 排除不合理的点
                             mLocation = updateLocation;
                             mLastLocation = mLocation;
-                            if (mListener != null) {
-                                mListener.onReceiveCommonLocation(mLocation, location);
-                            }
+                        }
+                        if (mListener != null) {
+                            mListener.onReceiveCommonLocation(mLocation, location);
                         }
 
                         long time = System.currentTimeMillis();
@@ -288,9 +288,9 @@ public class LocationUpdate {
                         if (distance > 10 && distance < 500) {  // 排除不合理的点
                             mLocation = updateLocation;
                             mLastLocation = mLocation;
-                            if (mListener != null) {
-                                mListener.onReceiveCommonLocation(mLocation, location);
-                            }
+                        }
+                        if (mListener != null) {
+                            mListener.onReceiveCommonLocation(mLocation, location);
                         }
 
                         long time = System.currentTimeMillis();

@@ -149,8 +149,12 @@ public class MainActivity extends Activity implements CommonLocationListener {
         }
         LatLng tempSampleLoc = new LatLng(sample_location.getLatitude(), sample_location.getLongitude());
         mOriginTrackList.add(tempSampleLoc);
-        LatLng tempNoNiLineLoc = new LatLng(origin_location.getLatitude(), origin_location.getLongitude());
-        mNoNiLineList.add(tempNoNiLineLoc);
+        LatLng lastOne = mNoNiLineList.get(mNoNiLineList.size()-1);
+        if (lastOne.latitude != origin_location.getLatitude()
+                || lastOne.longitude != origin_location.getLongitude()) {
+            LatLng tempNoNiLineLoc = new LatLng(origin_location.getLatitude(), origin_location.getLongitude());
+            mNoNiLineList.add(tempNoNiLineLoc);
+        }
         long time = System.currentTimeMillis();
         String timedate = TimeUtils.formatLocationTime(time);
         String data = "Gps---onReceiveCommonLocation -the location is: " + sample_location.getLatitude() + ","
