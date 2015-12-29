@@ -191,13 +191,6 @@ public class LocationUpdate {
         @Override
         public void onLocationChanged(Location location) {
             mSampleList.add(location);
-            double distance = LocationUtils.distanceBetween(mLastLocation, location);
-            if (distance < 10 || distance > 500) {
-                mLastLocation = location;
-                if(mSampleList.size() > 1) {
-                    mSampleList.remove(location);
-                }
-            }
 
             if (checkFittingInterval()) {
                 PolynomialEquation equation = EquationUtils.fittingLineToPoints(mSampleList);
@@ -210,12 +203,17 @@ public class LocationUpdate {
                         updateLocation.setLatitude(fittingLatitude);
                         updateLocation.setLongitude(fittingLongitude);
                         updateLocation.setTime(System.currentTimeMillis());
-                        mLocation = updateLocation;
-                        mSampleList.clear();
-                        mLastLocation = mLocation;
-                        if (mListener != null) {
-                            mListener.onReceiveCommonLocation(mLocation, location);
+                        mSampleList.clear();   // 清空待拟合的位置
+
+                        double distance = LocationUtils.distanceBetween(mLastLocation, updateLocation);
+                        if (distance > 10 && distance < 500) {  // 排除不合理的点
+                            mLocation = updateLocation;
+                            mLastLocation = mLocation;
+                            if (mListener != null) {
+                                mListener.onReceiveCommonLocation(mLocation, location);
+                            }
                         }
+
                         long time = System.currentTimeMillis();
                         String timedate = TimeUtils.formatLocationTime(time);
                         String data = "Gps---get origin location is: " + location.getLatitude() + ","
@@ -273,13 +271,6 @@ public class LocationUpdate {
         @Override
         public void onLocationChanged(Location location) {
             mSampleList.add(location);
-            double distance = LocationUtils.distanceBetween(mLastLocation, location);
-            if (distance < 10 || distance > 500) {
-                mLastLocation = location;
-                if(mSampleList.size() > 1) {
-                    mSampleList.remove(location);
-                }
-            }
             if (checkFittingInterval()) {
                 PolynomialEquation equation = EquationUtils.fittingLineToPoints(mSampleList);
                 if (equation != null) {
@@ -291,12 +282,17 @@ public class LocationUpdate {
                         updateLocation.setLatitude(fittingLatitude);
                         updateLocation.setLongitude(fittingLongitude);
                         updateLocation.setTime(System.currentTimeMillis());
-                        mLocation = updateLocation;
-                        mSampleList.clear();
-                        mLastLocation = mLocation;
-                        if (mListener != null) {
-                            mListener.onReceiveCommonLocation(mLocation, location);
+                        mSampleList.clear();   // 清空待拟合的位置
+
+                        double distance = LocationUtils.distanceBetween(mLastLocation, updateLocation);
+                        if (distance > 10 && distance < 500) {  // 排除不合理的点
+                            mLocation = updateLocation;
+                            mLastLocation = mLocation;
+                            if (mListener != null) {
+                                mListener.onReceiveCommonLocation(mLocation, location);
+                            }
                         }
+
                         long time = System.currentTimeMillis();
                         String timedate = TimeUtils.formatLocationTime(time);
                         String data = "Network---get origin location is: " + location.getLatitude() + ","
