@@ -11,7 +11,9 @@ public class EquationUtils {
 
     public static PolynomialEquation fittingLineToPoints(List<Location> mapPoints) {
         PolynomialEquation lineEquation = new PolynomialEquation();
-
+        if (mapPoints == null || mapPoints.size() < 1) {
+            return null;
+        }
         double sumX = 0;
         double sumY = 0;
         double sumX2 = 0;
@@ -31,6 +33,9 @@ public class EquationUtils {
     }
 
     public static double getMeanLongitude(List<Location> mapPoints) {
+        if (mapPoints == null || mapPoints.size() < 1) {
+            return Double.NaN;
+        }
         double sumLongitude = 0;
         for (Location point : mapPoints) {
             sumLongitude += point.getLongitude();

@@ -15,6 +15,7 @@ import com.location.demo.map_location_smoothe_demo.equation.EquationUtils;
 import com.location.demo.map_location_smoothe_demo.equation.PolynomialEquation;
 import com.location.demo.map_location_smoothe_demo.listener.CommonLocationListener;
 import com.location.demo.map_location_smoothe_demo.utils.FileUtils;
+import com.location.demo.map_location_smoothe_demo.utils.LocationUtils;
 import com.location.demo.map_location_smoothe_demo.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class LocationUpdate {
     private long mLastUploadPoiTime;
     private LocationManager mLocationManager;
     private Location mLocation;
+    private Location mLastLocation;
     private CommonLocationListener mListener;
     private Runnable mRun;
     private Handler mHandler;
@@ -51,7 +53,7 @@ public class LocationUpdate {
      * @param context 上下文
      * @param mode    定位类型，Gps类型或网络类型或自动类型
      */
-    private LocationUpdate(Context context,int mode) {
+    private LocationUpdate(Context context, int mode) {
         mContext = context;
         mLocationMode = mode;
         initLocationManager();
@@ -189,26 +191,39 @@ public class LocationUpdate {
         @Override
         public void onLocationChanged(Location location) {
             mSampleList.add(location);
-            if (checkFittingInterval()) {
-                PolynomialEquation equation =  EquationUtils.fittingLineToPoints(mSampleList);
-                double fittingLongitude = EquationUtils.getMeanLongitude(mSampleList);
-                double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
-                if (!Double.isNaN(fittingLatitude) && !Double.isNaN(fittingLongitude)) {
-                    Location updateLocation = new Location(LocationManager.GPS_PROVIDER);
-                    updateLocation.setLatitude(fittingLatitude);
-                    updateLocation.setLongitude(fittingLongitude);
-                    updateLocation.setTime(System.currentTimeMillis());
-                    mLocation = updateLocation;
-                    mSampleList.clear();
-                    long time = System.currentTimeMillis();
-                    String timedate = TimeUtils.formatLocationTime(time);
-                    String data = "Gps---get origin location is: " + location.getLatitude() + ","
-                            + location.getLongitude();
-                    FileUtils.saveFile(timedate + "  " + data, "originlocation_demo");
+            double distance = LocationUtils.distanceBetween(mLastLocation, location);
+            if (distance < 10 || distance > 500) {
+                mLastLocation = location;
+                if(mSampleList.size() > 1) {
+                    mSampleList.remove(location);
                 }
-                if (mListener != null) {
-                        mListener.onReceiveCommonLocation(mLocation, location);
+            }
+
+            if (checkFittingInterval()) {
+                PolynomialEquation equation = EquationUtils.fittingLineToPoints(mSampleList);
+                if (equation != null) {
+                    double fittingLongitude = EquationUtils.getMeanLongitude(mSampleList);
+                    double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
+
+                    if (!Double.isNaN(fittingLatitude) && !Double.isNaN(fittingLongitude)) {
+                        Location updateLocation = new Location(LocationManager.GPS_PROVIDER);
+                        updateLocation.setLatitude(fittingLatitude);
+                        updateLocation.setLongitude(fittingLongitude);
+                        updateLocation.setTime(System.currentTimeMillis());
+                        mLocation = updateLocation;
+                        mSampleList.clear();
+                        mLastLocation = mLocation;
+                        if (mListener != null) {
+                            mListener.onReceiveCommonLocation(mLocation, location);
+                        }
+                        long time = System.currentTimeMillis();
+                        String timedate = TimeUtils.formatLocationTime(time);
+                        String data = "Gps---get origin location is: " + location.getLatitude() + ","
+                                + location.getLongitude();
+                        FileUtils.saveFile(timedate + "  " + data, "originlocation_demo");
                     }
+                }
+
             }
             /*if (mSampleList.size() == 10) {
                 PolynomialEquation equation =  EquationUtils.fittingLineToPoints(mSampleList);
@@ -258,25 +273,36 @@ public class LocationUpdate {
         @Override
         public void onLocationChanged(Location location) {
             mSampleList.add(location);
-            if (checkFittingInterval()) {
-                PolynomialEquation equation =  EquationUtils.fittingLineToPoints(mSampleList);
-                double fittingLongitude = EquationUtils.getMeanLongitude(mSampleList);
-                double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
-                if (!Double.isNaN(fittingLatitude) && !Double.isNaN(fittingLongitude)) {
-                    Location updateLocation = new Location(LocationManager.NETWORK_PROVIDER);
-                    updateLocation.setLatitude(fittingLatitude);
-                    updateLocation.setLongitude(fittingLongitude);
-                    updateLocation.setTime(System.currentTimeMillis());
-                    mLocation = updateLocation;
-                    mSampleList.clear();
-                    long time = System.currentTimeMillis();
-                    String timedate = TimeUtils.formatLocationTime(time);
-                    String data = "Network---get origin location is: " + location.getLatitude() + ","
-                            + location.getLongitude();
-                    FileUtils.saveFile(timedate + "  " + data, "originlocation_demo");
+            double distance = LocationUtils.distanceBetween(mLastLocation, location);
+            if (distance < 10 || distance > 500) {
+                mLastLocation = location;
+                if(mSampleList.size() > 1) {
+                    mSampleList.remove(location);
                 }
-                if (mListener != null) {
-                    mListener.onReceiveCommonLocation(mLocation, location);
+            }
+            if (checkFittingInterval()) {
+                PolynomialEquation equation = EquationUtils.fittingLineToPoints(mSampleList);
+                if (equation != null) {
+                    double fittingLongitude = EquationUtils.getMeanLongitude(mSampleList);
+                    double fittingLatitude = equation.a1 * fittingLongitude + equation.a0;
+
+                    if (!Double.isNaN(fittingLatitude) && !Double.isNaN(fittingLongitude)) {
+                        Location updateLocation = new Location(LocationManager.NETWORK_PROVIDER);
+                        updateLocation.setLatitude(fittingLatitude);
+                        updateLocation.setLongitude(fittingLongitude);
+                        updateLocation.setTime(System.currentTimeMillis());
+                        mLocation = updateLocation;
+                        mSampleList.clear();
+                        mLastLocation = mLocation;
+                        if (mListener != null) {
+                            mListener.onReceiveCommonLocation(mLocation, location);
+                        }
+                        long time = System.currentTimeMillis();
+                        String timedate = TimeUtils.formatLocationTime(time);
+                        String data = "Network---get origin location is: " + location.getLatitude() + ","
+                                + location.getLongitude();
+                        FileUtils.saveFile(timedate + "  " + data, "originlocation_demo");
+                    }
                 }
             }
         }

@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements CommonLocationListener {
         mJiuPianBtn = (Button) findViewById(R.id.btn_jiupian);
         mHistoryBtn = (Button) findViewById(R.id.btn_origin);
 
-        mLocationUpdate = new LocationUpdate.Builder(this).setMode(LocationUpdate.GPS_MODE).create();
+        mLocationUpdate = new LocationUpdate.Builder(this).setMode(LocationUpdate.AUTO_MODE).create();
         mLocationUpdate.registerCommonLocationListener(this);
 
 
