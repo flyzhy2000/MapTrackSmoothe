@@ -148,16 +148,16 @@ public class LocationUpdate {
                 public void handleMessage(Message msg) {
                     super.handleMessage(msg);
                     if (mLocationMode == GPS_MODE) {
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                                mScanSpan, 0, GpsLocationListener);
+                        mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,
+                                GpsLocationListener, mContext.getMainLooper());
                     } else if (mLocationMode == NETWORK_MODE) {
-                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                                mScanSpan, 0, NetworkLocationListener);
+                        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER,
+                                NetworkLocationListener, mContext.getMainLooper());
                     } else if (mLocationMode == AUTO_MODE) {
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                                mScanSpan, 0, GpsLocationListener);
-                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                                mScanSpan, 0, NetworkLocationListener);
+                        mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,
+                                GpsLocationListener, mContext.getMainLooper());
+                        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER,
+                                NetworkLocationListener, mContext.getMainLooper());
                     }
                 }
             };
